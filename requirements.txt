@@ -1,0 +1,5 @@
+streamlit
+openjij
+pyqubo
+matplotlib
+numpy
