@@ -126,10 +126,10 @@ cost3 = 1/K * sum((sum(w2[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w2[i]*x[i
 #同じクラスだと加算する
 cost4_in=0
 for k in range(K):
-  for i in range(N):
-    if p[i,k]==1:
-      cost4_in += (sum(p[i,k]*x[i,k] for k in range(K)))**2
-#    cost4_in = sum((sum(p[i, k] * x[i, k] for k in range(K)))**2 for i in range(N) if p[i, k] == 1)
+#  for i in range(N):
+#    if p[i,k]==1:
+#      cost4_in += (sum(p[i,k]*x[i,k] for k in range(K)))**2
+    cost4_in = sum((sum(p[i, k] * x[i, k] for k in range(K)))**2 for i in range(N) if p[i, k] == 1)
 cost4 = 1/N*cost4_in
 
 cost = a*cost1 + b*cost2 + c*cost3 + d*cost4
