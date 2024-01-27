@@ -51,6 +51,19 @@ def upload_file_youin():
             p=column4_data
             return w, w1, w2, p
 
+def download_csv(data, filename='data.csv'):
+    df = pd.DataFrame(data)
+    csv = df.to_csv(index=True)
+
+    b64 = b64encode(csv.encode()).decode()
+    st.markdown(f'''
+    <a href="data:file/csv;base64,{b64}" download="{filename}">
+        クラス分け結果のダウンロード
+    </a>
+    ''', unsafe_allow_html=True)
+
+
+
 try:
     w, w1, w2, p = upload_file_youin()
     st.write("生徒数：N = ",len(w))
@@ -82,18 +95,6 @@ except Exception as e:
 
 
 #p = [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3]
-
-
-def download_csv(data, filename='data.csv'):
-    df = pd.DataFrame(data)
-    csv = df.to_csv(index=True)
-
-    b64 = b64encode(csv.encode()).decode()
-    st.markdown(f'''
-    <a href="data:file/csv;base64,{b64}" download="{filename}">
-        クラス分け結果のダウンロード
-    </a>
-    ''', unsafe_allow_html=True)
 
 
 #st.write(K)
