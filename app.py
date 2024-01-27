@@ -109,7 +109,7 @@ for i, element in enumerate(p):
 
 p=np.array(one_hot)
 # Print the one-hot matrix
-#print(p)
+st.write(p)
 
 lam1 = 10
 lam2 = 10
