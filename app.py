@@ -97,166 +97,166 @@ def download_csv(data, filename='data.csv'):
 
 
 # Find the number of unique elements in the list
-try:
-    num_unique = len(set(p))
+#try:
+num_unique = len(set(p))
 
 # Create a zero matrix of size (length of list, number of unique elements)
-    one_hot = [[0 for _ in range(num_unique)] for _ in range(len(p))]
+one_hot = [[0 for _ in range(num_unique)] for _ in range(len(p))]
 
 # For each element in the list, set the corresponding element in the one-hot matrix to 1
-    for i, element in enumerate(p):
-        one_hot[i][element] = 1
+for i, element in enumerate(p):
+    one_hot[i][element] = 1
 
-    p=np.array(one_hot)
+p=np.array(one_hot)
 # Print the one-hot matrix
 #print(p)
 
-    lam1 = 10
-    lam2 = 10
-    a=1
-    b=1
-    c=1
-    d=10
+lam1 = 10
+lam2 = 10
+a=1
+b=1
+c=1
+d=10
 
-    x = Array.create(name='x', shape=(N,K), vartype='BINARY')
-    cost1  = 1/K * sum((sum(w[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
-    cost2 = 1/K * sum((sum(w1[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w1[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
-    cost3 = 1/K * sum((sum(w2[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w2[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
+x = Array.create(name='x', shape=(N,K), vartype='BINARY')
+cost1  = 1/K * sum((sum(w[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
+cost2 = 1/K * sum((sum(w1[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w1[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
+cost3 = 1/K * sum((sum(w2[i]*x[i,k] for i in range(N)) - 1/K * sum(sum(w2[i]*x[i,k] for i in range(N)) for k in range(K)))**2 for k in range(K))
 
 #同じクラスだと加算する
-    cost4_in=0
-    for k in range(K):
+cost4_in=0
+for k in range(K):
 #  for i in range(N):
 #    if p[i,k]==1:
 #      cost4_in += (sum(p[i,k]*x[i,k] for k in range(K)))**2
-        cost4_in = sum((sum(p[i, k] * x[i, k] for k in range(K)))**2 for i in range(N) if p[i, k] == 1)
-    cost4 = 1/N*cost4_in
+    cost4_in = sum((sum(p[i, k] * x[i, k] for k in range(K)))**2 for i in range(N) if p[i, k] == 1)
+cost4 = 1/N*cost4_in
 
-    cost = a*cost1 + b*cost2 + c*cost3 + d*cost4
+cost = a*cost1 + b*cost2 + c*cost3 + d*cost4
 
-    penalty1 = lam1 * sum((sum(x[i,k] for k in range(K)) -1 )**2 for i in range(N))
-    penalty2 = lam2 * sum((sum(x[i,k] for i in range(N)) -N/K )**2 for k in range(K))
-    penalty = penalty1 + penalty2
+penalty1 = lam1 * sum((sum(x[i,k] for k in range(K)) -1 )**2 for i in range(N))
+penalty2 = lam2 * sum((sum(x[i,k] for i in range(N)) -N/K )**2 for k in range(K))
+penalty = penalty1 + penalty2
 
-    y = cost + penalty
-    model = y.compile()
-    Q, offset = model.to_qubo()
+y = cost + penalty
+model = y.compile()
+Q, offset = model.to_qubo()
 #print(Q)
 
 #シミュレーション実施
 #from openjij import SQASampler
-    sampler = SQASampler()
-    sampleset = sampler.sample_qubo(Q, num_reads=1000)
+sampler = SQASampler()
+sampleset = sampler.sample_qubo(Q, num_reads=1000)
 
 #ndarrayに変換
-    sample_array = []
-    for i in range(N):
-      sample_list = []
-      for k in range(K):
+sample_array = []
+for i in range(N):
+    sample_list = []
+    for k in range(K):
         sample_list.append(sampleset.first.sample[f'x[{i}][{k}]'])
-      sample_array.append(sample_list)
-    sample_array = np.array(sample_array)
-    df=sample_array
+    sample_array.append(sample_list)
+sample_array = np.array(sample_array)
+df=sample_array
 
 #結果表示
 #st.write(sample_array)
 # NumPy配列を表示
-    st.write("結果表示:")
-    st.write(sample_array)
+st.write("結果表示:")
+st.write(sample_array)
 #st.write(type(sample_array))
 
 
 # ダウンロードボタンを表示
-    download_csv(sample_array)
-    st.write('')
-    st.write('')
+download_csv(sample_array)
+st.write('')
+st.write('')
 
 #生徒の成績テーブルの平均
-    Wu = 1/K * sum(w[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
-    st.write('成績：'f'ave={Wu}')
-    W1u = 1/K * sum(w1[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
-    st.write('性別：'f'ave1={W1u}')
-    W2u = 1/K * sum(w2[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
-    st.write('要支援：'f'ave2={W2u}')
-    st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
-    st.write('')
+Wu = 1/K * sum(w[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
+st.write('成績：'f'ave={Wu}')
+W1u = 1/K * sum(w1[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
+st.write('性別：'f'ave1={W1u}')
+W2u = 1/K * sum(w2[i]*sum(sample_array[i][k] for k in range(K)) for i in range(N))
+st.write('要支援：'f'ave2={W2u}')
+st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
+st.write('')
 #各クラスでの成績合計、コスト（分散）、標準偏差を表示
-    st.write('各クラスでの成績合計、コスト（分散）、標準偏差を表示')
-    cost = 0
-    for k in range(K):
-      value = 0
-      for i in range(N):
+st.write('各クラスでの成績合計、コスト（分散）、標準偏差を表示')
+cost = 0
+for k in range(K):
+    value = 0
+    for i in range(N):
         value = value + sample_array[i][k] * w[i]
-      st.write(f'{value=}')
-      cost = cost + (value - Wu)**2
-    cost = 1/K * cost
-    st.write(f'{cost=}')
-    standard_deviation = math.sqrt(cost)#標準偏差
-    st.write(f'{standard_deviation=}')
-    st.write('')
+    st.write(f'{value=}')
+    cost = cost + (value - Wu)**2
+cost = 1/K * cost
+st.write(f'{cost=}')
+standard_deviation = math.sqrt(cost)#標準偏差
+st.write(f'{standard_deviation=}')
+st.write('')
 #各クラスに対して置くべき生徒を表示
-    for k in range(K):
-      st.write(f'{k=}', end=' : ')
+for k in range(K):
+    st.write(f'{k=}', end=' : ')
 
-      output_text = "    ".join([str(w[i]) for i in range(N) if sample_array[i][k] == 1])
-      st.write(output_text)
+    output_text = "    ".join([str(w[i]) for i in range(N) if sample_array[i][k] == 1])
+    st.write(output_text)
 #  for i in range(N):
 #    if sample_array[i][k] == 1:
 #        st.write(w[i], end=' ')
-      st.write('')#改行
-    st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
+    st.write('')#改行
+st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
 #各クラスでの性別合計、コスト（分散）、標準偏差を表示
-    st.write('各クラスでの性別合計、コスト（分散）、標準偏差を表示')
-    cost1 = 0
-    for k in range(K):
-      value1 = 0
-      for i in range(N):
+st.write('各クラスでの性別合計、コスト（分散）、標準偏差を表示')
+cost1 = 0
+for k in range(K):
+    value1 = 0
+    for i in range(N):
         value1 = value1 + sample_array[i][k] * w1[i]
-      st.write(f'{value1=}')
-      cost1 = cost1 + (value - W1u)**2
-    cost1 = 1/K * cost1
-    st.write(f'{cost1=}')
-    standard_deviation1 = math.sqrt(cost1)#標準偏差
-    st.write(f'{standard_deviation1=}')
-    st.write('')
+    st.write(f'{value1=}')
+    cost1 = cost1 + (value - W1u)**2
+cost1 = 1/K * cost1
+st.write(f'{cost1=}')
+standard_deviation1 = math.sqrt(cost1)#標準偏差
+st.write(f'{standard_deviation1=}')
+st.write('')
 #各クラスに対して置くべき生徒を表示
-    for k in range(K):
-      st.write(f'{k=}', end=' : ')
-      output_text = "    ".join([str(w1[i]) for i in range(N) if sample_array[i][k] == 1])
-      st.write(output_text)
-      st.write('')#改行
-    st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
+for k in range(K):
+    st.write(f'{k=}', end=' : ')
+    output_text = "    ".join([str(w1[i]) for i in range(N) if sample_array[i][k] == 1])
+    st.write(output_text)
+    st.write('')#改行
+st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
 #各クラスでの要支援合計、コスト（分散）、標準偏差を表示
-    st.write('各クラスでの要支援合計、コスト（分散）、標準偏差を表示')
-    cost2 = 0
-    for k in range(K):
-      value2 = 0
-      for i in range(N):
+st.write('各クラスでの要支援合計、コスト（分散）、標準偏差を表示')
+cost2 = 0
+for k in range(K):
+    value2 = 0
+    for i in range(N):
         value2 = value2 + sample_array[i][k] * w2[i]
-      st.write(f'{value2=}')
-      cost2 = cost2 + (value2 - W2u)**2
-    cost2 = 1/K * cost2
-    st.write(f'{cost2=}')
-    standard_deviation2 = math.sqrt(cost2)#標準偏差
-    st.write(f'{standard_deviation2=}')
-    st.write('')
+    st.write(f'{value2=}')
+    cost2 = cost2 + (value2 - W2u)**2
+cost2 = 1/K * cost2
+st.write(f'{cost2=}')
+standard_deviation2 = math.sqrt(cost2)#標準偏差
+st.write(f'{standard_deviation2=}')
+st.write('')
 #各クラスに対して置くべき生徒を表示
-    for k in range(K):
-      st.write(f'{k=}', end=' : ')
-      output_text = "    ".join([str(w2[i]) for i in range(N) if sample_array[i][k] == 1])
-      st.write(output_text)
-      st.write('')#改行
-    st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
+for k in range(K):
+    st.write(f'{k=}', end=' : ')
+    output_text = "    ".join([str(w2[i]) for i in range(N) if sample_array[i][k] == 1])
+    st.write(output_text)
+    st.write('')#改行
+st.write('ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー')
 
 #罰金項のチェック
-    st.write('生徒一人のクラスの確認：count', end='')
-    for i in range(N):
-      count = 0
-      for k in range(K):
-            count = count + sample_array[i][k]
+st.write('生徒一人のクラスの確認：count', end='')
+for i in range(N):
+    count = 0
+    for k in range(K):
+        count = count + sample_array[i][k]
 #  st.write(f'{count}', end=',')
-    output_text = "    ".join([str(count) for i in range(N)])
-    st.write(output_text)
+output_text = "    ".join([str(count) for i in range(N)])
+st.write(output_text)
 
-except Exception as e:
-    st.error("クラス数確定後に計算されます".format(e))
+#except Exception as e:
+#    st.error("クラス数確定後に計算されます".format(e))
