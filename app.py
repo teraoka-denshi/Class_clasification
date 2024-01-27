@@ -98,8 +98,8 @@ def download_csv(data, filename='data.csv'):
 
 # Find the number of unique elements in the list
 #try:
-num_unique = len(set(p))
-
+#num_unique = len(set(p))
+num_unique = K
 # Create a zero matrix of size (length of list, number of unique elements)
 one_hot = [[0 for _ in range(num_unique)] for _ in range(len(p))]
 
