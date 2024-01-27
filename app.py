@@ -96,7 +96,7 @@ def download_csv(data, filename='data.csv'):
     ''', unsafe_allow_html=True)
 
 
-st.write(K)
+#st.write(K)
 # Find the number of unique elements in the list
 #try:
 #num_unique = len(set(p))
